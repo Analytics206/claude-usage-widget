@@ -3,7 +3,7 @@
 All notable changes to this project are documented here.
 This project follows [semantic versioning](https://semver.org/).
 
-## Unreleased
+## 0.13.1
 
 ### Fixed
 
@@ -12,7 +12,18 @@ This project follows [semantic versioning](https://semver.org/).
   input/output and 2.5x high on cache reads ($0.50 vs $0.20). Claude Code
   traffic is mostly cache reads, so Opus 5.5 cost showed about **2x** its real
   figure (a real day: $43.09 shown vs $20.94 actual). It also logged an
-  "unknown model" warning every refresh.
+  "unknown model" warning every refresh. Cross-checked against the cost
+  Claude Code itself records for a session: identical to the cent.
+  Thanks @boordg (#30).
+
+### Changed
+
+- **The family fallback now leans toward over-counting.** It only ever prices
+  a model release the table has not caught up with yet, and for those it now
+  uses the most expensive current member of the family: Opus 5 rather than
+  the cheaper Opus 5.5, and Fable 5 rather than Fable 5.1. In a spend tool an
+  over-count is the safer mistake, and the unknown-model warning still fires
+  so the release gets tabled. No current model is affected.
 
 ## 0.13.0
 
