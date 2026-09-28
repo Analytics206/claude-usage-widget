@@ -165,9 +165,15 @@ class TestCalculateCostUnknownModel:
         assert not any(issubclass(w.category, UserWarning) for w in caught)
 
     def test_unknown_fable_falls_back_to_fable_pricing(self):
-        """A future Fable point release resolves to the Fable tier, not Sonnet."""
-        result = calculate_cost("claude-fable-5-1", 1_000_000, 0)
+        """A future Fable release resolves to the Fable tier, not Sonnet, and
+        to the family's most expensive cache-read rate (Fable 5's $1.00, not
+        Fable 5.1's $0.25): an unseen model is over-counted, never under."""
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            result = calculate_cost("claude-fable-9-9", 1_000_000, 0,
+                                    cache_read=1_000_000)
         assert _approx(result["input"], 10.0)
+        assert _approx(result["cache_read"], 1.00)
 
     def test_unknown_haiku_falls_back_to_haiku_pricing(self):
         """An unknown Haiku id resolves to the Haiku tier ($1/M input)."""

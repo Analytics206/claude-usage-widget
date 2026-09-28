@@ -188,17 +188,21 @@ MODEL_PRICING: Dict[str, Dict[str, float]] = {
 _FALLBACK_MODEL = "claude-sonnet-4-6"
 
 # Per-family fallback used when an exact model id is unknown but its family
-# name is recognisable from the id (e.g. a freshly released "claude-opus-4-8"
+# name is recognisable from the id (e.g. a freshly released "claude-opus-6"
 # before the table above is updated). Anthropic embeds the family in every
-# model id, so matching on it keeps a new point release billed at its real
-# tier instead of being silently under-reported at Sonnet rates. Each value
-# points at a recent member priced at the family's standard tier — not
-# necessarily the newest: Opus stays on Opus 5 ($5/$25) because Opus 5.5's
-# $4/$20 is a price cut, and an unknown Opus id is likelier an older/dated
-# variant at the $5 tier than a newer, cheaper release.
+# model id, so matching on it keeps a new release billed at its own tier
+# instead of being silently under-reported at Sonnet rates.
+#
+# Every current id is tabled, and dated ids are stripped to their alias
+# first, so in practice this only ever prices a release we have not seen
+# yet. For those, each value points at the MOST EXPENSIVE current member of
+# the family rather than the newest: in a spend tool an over-count is the
+# safer mistake, and the unknown-model warning fires either way, which is
+# the signal to table it. Hence Opus 5 ($5/$25, $0.50 reads) over the
+# cheaper Opus 5.5, and Fable 5 ($1.00 reads) over Fable 5.1 ($0.25).
 _FAMILY_FALLBACK: Dict[str, str] = {
     "opus": "claude-opus-5",
-    "fable": "claude-fable-5-1",
+    "fable": "claude-fable-5",
     "sonnet": "claude-sonnet-5",
     "haiku": "claude-haiku-4-5-20251001",
 }
